@@ -1,28 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <time.h>
 #include <stdbool.h>
-#include <string.h>
-
-typedef struct
-{
-    int i;
-    int j;
-}
-position;
-
-typedef struct node
-{
-    position pos;
-    struct node* next;
-}
-node;
+#include "battleship.h"
 
 position randomNode(struct node *head);
 void printBoard(char board[16][16]);
 node* createNode(position array[4], int i);
 node* createNthNode(position array[4], int i, node* head);
+void placeBB(int x1, int x2, int y1, int y2, char board[16][16], char type);
+void placeCV(int x1, int x2, int y1, int y2, char board[16][16], char type);
+void placeOtherShips(char board[16][16]);
 
 int main(void){
     srand(time(NULL));
@@ -70,31 +58,7 @@ int main(void){
     }
     int cI2=randomNode(positionPossibleCV).i;
     int cJ2=randomNode(positionPossibleCV).j;
-    if(cI1==cI2){
-        if(cJ1>cJ2){
-            for(int j=cJ2; j<=cJ1; j++){
-                enemyBoard[cI1][j]='C';
-            }
-        }
-        if(cJ2>cJ1){
-            for(int j=cJ1; j<=cJ2; j++){
-                enemyBoard[cI1][j]='C';
-            }
-        }
-    }
-    if(cJ1==cJ2){
-        if(cI1>cI2){
-            for(int i=cI2; i<=cI1; i++){
-                enemyBoard[i][cJ1]='C';
-            }
-        }
-        if(cI2>cI1){
-            for(int i=cI1; i<=cI2; i++){
-                enemyBoard[i][cJ1]='C';
-            }
-        }
-    }
-
+    placeCV(cI1,cI2,cJ1,cJ2,enemyBoard,'C');
 
     //generate enemy BB position
     int bI1=rand()%16;
@@ -234,128 +198,9 @@ int main(void){
 
     int bI2 = randomNode(head).i;
     int bJ2 = randomNode(head).j;
-    if(bI2==bI1){
-        if(bJ2<bJ1){
-            for(int j=bJ2; j<=bJ1; j++){
-                enemyBoard[bI1][j]='B';
-            }
-        }else{
-            for(int j=bJ1; j<=bJ2; j++){
-                enemyBoard[bI1][j]='B';
-            }
-        }
-    }else{
-        if(bI2<bI1){
-            for(int i=bI2; i<=bI1; i++){
-                enemyBoard[i][bJ1]='B';
-            }
-        }else{
-            for(int i=bI1; i<=bI2; i++){
-                enemyBoard[i][bJ1]='B';
-            }
-        }
-    }
-
-    //generate 2 enemy Submarines (S) and 3 enemy Destroyers (D)
-    for(int a=0; a<5; a++){
-        position array[6][3];
-        int sI=rand()%14+1;
-        int sJ=rand()%14+1;
-        int counter=0;
-        for(int i=sI-1; i<=sI+1; i++){
-            int rowSum=0;
-            for(int j=sJ-1; j<=sJ+1; j++){
-                rowSum+=(int)enemyBoard[i][j];
-            }
-            if(rowSum==126){
-                for(int x=0,j=sJ-1; x<3; x++, j++){
-                    array[counter][x].i=i;
-                    array[counter][x].j=j;
-                }
-                counter++;
-            }
-        }
-        for(int j=sJ-1; j<=sJ+1; j++){
-            int colSum=0;
-            for(int i=sI-1; i<=sI+1; i++){
-                colSum+=(int)enemyBoard[i][j]; 
-            }
-            if(colSum==126){
-                for(int x=0, i=sI-1; x<3; x++, i++){
-                    array[counter][x].i=i;
-                    array[counter][x].j=j;
-                }
-                counter++;
-            }
-        }
-        srandom(time(NULL));
-        int index = rand()%counter;
-        for(int i=0; i<3; i++){
-            if(a==0){
-                enemyBoard[array[index][i].i][array[index][i].j]='S';
-            }else if(a==1){
-                enemyBoard[array[index][i].i][array[index][i].j]='A';
-            }else if(a==2){
-                enemyBoard[array[index][i].i][array[index][i].j]='D';
-            }else if(a==3){
-                enemyBoard[array[index][i].i][array[index][i].j]='L';
-            }else{
-                enemyBoard[array[index][i].i][array[index][i].j]='H';
-            }
-        }
-    }
+    placeBB(bI1, bI2, bJ1, bJ2, enemyBoard, 'B');
+    placeOtherShips(enemyBoard);
     printBoard(enemyBoard);
 
-}
-
-//reservoir sampling function to get random node from linked list
-position randomNode(struct node *head){
-    int reservoir[1];
-
-    srand(time(NULL));
-    position result = head->pos;
-    struct node *trav = head;
-    for(int n=2; trav != NULL; n++){
-        if(rand()%n==0){
-            result = trav->pos;
-        }
-        trav = trav->next;
-    }
-    return result;
-}
-
-//function for priting enemy board
-void printBoard(char board[16][16]){
-    for(int i=0; i<16; i++){
-        for(int j=0; j<16; j++){
-            if(board[i][j]=='*'){
-                printf ("\033[0;34m");
-                printf("%c ", board[i][j]);
-                printf("\033[0m");
-            }else{
-                printf("%c ", board[i][j]);
-            }
-        }
-        printf("\n");
-    }
-}
-
-//function to create first node and link
-node* createNode(position array[4], int i){
-    node* a=malloc(sizeof(node));
-    a->pos.i=array[i].i;
-    a->pos.j=array[i].j;
-    a->next=NULL;
-    return a;
-}
-
-//function to create Nth node and link
-node* createNthNode(position array[4], int i, node* head){
-    node* b=malloc(sizeof(node));
-    b->pos.i=array[i].i;
-    b->pos.j=array[i].j;
-    b->next=head;
-    head=b;
-    return b;
 }
 
