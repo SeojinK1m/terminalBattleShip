@@ -34,7 +34,7 @@ position randomNode(struct node *head){
     return result;
 }
 
-//function for priting enemy board
+//function for printing board
 void printBoard(char board[16][16]){
     for(int i=0; i<16; i++){
         for(int j=0; j<16; j++){
@@ -171,3 +171,4 @@ void placeOtherShips(char board[16][16]){
         }
     }
 }
+
