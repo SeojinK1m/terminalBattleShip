@@ -21,6 +21,8 @@ node;
 
 position randomNode(struct node *head);
 void printBoard(char board[16][16]);
+node* createNode(position array[4], int i);
+node* createNthNode(position array[4], int i, node* head);
 
 int main(void){
     srand(time(NULL));
@@ -60,17 +62,9 @@ int main(void){
         }else{
             //create a node and link to positionPossibleCV
             if(positionPossibleCV==NULL){
-                node* a=malloc(sizeof(node));
-                a->pos.i=positionPotentialCV[i].i;
-                a->pos.j=positionPotentialCV[i].j;
-                a->next=NULL;
-                positionPossibleCV=a;
+                positionPossibleCV=createNode(positionPotentialCV, i);
             }else{
-                node* b=malloc(sizeof(node));
-                b->pos.i=positionPotentialCV[i].i;
-                b->pos.j=positionPotentialCV[i].j;
-                b->next=positionPossibleCV;
-                positionPossibleCV=b;
+                positionPossibleCV=createNthNode(positionPotentialCV, i, positionPossibleCV);
             }
         }
     }
@@ -100,12 +94,6 @@ int main(void){
             }
         }
     }
-    for(int i=0; i<16; i++){
-        for(int j=0; j<16; j++){
-            printf("%c", enemyBoard[i][j]);
-        }
-        printf("\n");
-    }
 
 
     //generate enemy BB position
@@ -119,9 +107,6 @@ int main(void){
             break;
         }
     }
-
-    printf("%i\n", bI1);
-    printf("%i\n", bJ1);
 
     position positionPotentialBB[4];
     node *positionPossibleBB=NULL;
@@ -141,17 +126,9 @@ int main(void){
             continue;
         }else{
             if(positionPossibleCV==NULL){
-                node* a=malloc(sizeof(node));
-                a->pos.i=positionPotentialBB[i].i;
-                a->pos.j=positionPotentialBB[i].j;
-                a->next=NULL;
-                positionPossibleBB=a;
+                positionPossibleBB=createNode(positionPotentialBB, i);
             }else{
-                node* b=malloc(sizeof(node));
-                b->pos.i=positionPotentialBB[i].i;
-                b->pos.j=positionPotentialBB[i].j;
-                b->next=positionPossibleBB;
-                positionPossibleBB=b;
+                positionPossibleBB=createNthNode(positionPotentialBB, i, positionPossibleBB);
             }
         }
     }
@@ -162,8 +139,6 @@ int main(void){
     //create traversing pointer
     node* trav=positionPossibleBB;
     while(trav!=NULL){
-        printf("%i ", trav->pos.i);
-        printf("%i\n", trav->pos.j);
         int counter=0;
         if(trav->pos.i==bI1){
             if(bJ1<trav->pos.j){
@@ -259,8 +234,6 @@ int main(void){
 
     int bI2 = randomNode(head).i;
     int bJ2 = randomNode(head).j;
-    printf("%i ", bI2);
-    printf("%i\n", bJ2);
     if(bI2==bI1){
         if(bJ2<bJ1){
             for(int j=bJ2; j<=bJ1; j++){
@@ -288,20 +261,16 @@ int main(void){
         position array[6][3];
         int sI=rand()%14+1;
         int sJ=rand()%14+1;
-        printf("\n%i,%i\n", sI, sJ);
         int counter=0;
         for(int i=sI-1; i<=sI+1; i++){
             int rowSum=0;
             for(int j=sJ-1; j<=sJ+1; j++){
                 rowSum+=(int)enemyBoard[i][j];
             }
-            printf("rowsum: %i\n", rowSum);
             if(rowSum==126){
                 for(int x=0,j=sJ-1; x<3; x++, j++){
                     array[counter][x].i=i;
                     array[counter][x].j=j;
-                    printf("%i ", array[counter][x].i);
-                    printf("%i\n", array[counter][x].j);
                 }
                 counter++;
             }
@@ -311,7 +280,6 @@ int main(void){
             for(int i=sI-1; i<=sI+1; i++){
                 colSum+=(int)enemyBoard[i][j]; 
             }
-            printf("colsum: %i\n", colSum);
             if(colSum==126){
                 for(int x=0, i=sI-1; x<3; x++, i++){
                     array[counter][x].i=i;
@@ -320,15 +288,7 @@ int main(void){
                 counter++;
             }
         }
-        printf("\n");
-        for(int i=0; i<counter; i++){
-            for(int j=0; j<3; j++){
-                printf("%i ", array[i][j].i);
-                printf("%i\n", array[i][j].j);
-            }
-        }
         srandom(time(NULL));
-        printf(" counter: %i\n", counter);
         int index = rand()%counter;
         for(int i=0; i<3; i++){
             if(a==0){
@@ -344,8 +304,6 @@ int main(void){
             }
         }
     }
-
-    //genrate enemy PC position
     printBoard(enemyBoard);
 
 }
@@ -381,3 +339,23 @@ void printBoard(char board[16][16]){
         printf("\n");
     }
 }
+
+//function to create first node and link
+node* createNode(position array[4], int i){
+    node* a=malloc(sizeof(node));
+    a->pos.i=array[i].i;
+    a->pos.j=array[i].j;
+    a->next=NULL;
+    return a;
+}
+
+//function to create Nth node and link
+node* createNthNode(position array[4], int i, node* head){
+    node* b=malloc(sizeof(node));
+    b->pos.i=array[i].i;
+    b->pos.j=array[i].j;
+    b->next=head;
+    head=b;
+    return b;
+}
+
