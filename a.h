@@ -176,5 +176,4 @@ void generateBoard(char board[16][16]){
     int bJ2 = randomNode(head).j;
     placeBB(bI1, bI2, bJ1, bJ2, board, 'B');
     placeOtherShips(board);
-    printBoard(board);
 }

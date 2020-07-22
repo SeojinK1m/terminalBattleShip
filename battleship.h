@@ -39,10 +39,19 @@ void printBoard(char board[16][16]){
     for(int i=0; i<16; i++){
         for(int j=0; j<16; j++){
             if(board[i][j]=='*'){
-                printf ("\033[0;34m");
+                printf ("\033[1;34m");
                 printf("%c ", board[i][j]);
                 printf("\033[0m");
-            }else{
+            }else if(board[i][j]=='$'){
+                printf ("\033[1;31m");
+                printf("%c ", board[i][j]);
+                printf("\033[0m");
+            }else if(board[i][j]=='+'){
+                printf ("\033[0;35m");
+                printf("%c ", board[i][j]);
+                printf("\033[0m");
+            }
+            else{
                 printf("%c ", board[i][j]);
             }
         }
