@@ -49,7 +49,7 @@ int main(void){
     printBoard(myBoard);
 
     int eCountR=3, eCountT=1;
-    int mCountR=5, mCountT=2;
+    int mCountR=5, mCountT=3;
 
     while(true){
         int eCountS=0, eCountH=0, eCountL=0, eCountB=0, eCountA=0, eCountC=0, eCountD=0;
@@ -76,9 +76,22 @@ int main(void){
                 enemyBoard[mRow][mCol]='$';
                 enemyBoardOverlay[mRow][mCol]='$';
             }
-        }
-
-        if(action=='r'){
+        }else if(action=='t'){
+            if(mCountT==0){
+                continue;
+            }
+            for(int i=15; i>=0; i--){
+                if(enemyBoard[i][mCol]=='*'){
+                    enemyBoardOverlay[i][mCol]='/';
+                }else{
+                    enemyBoard[i][mCol]='$';
+                    enemyBoardOverlay[i][mCol]='$';
+                    printf("Your torpedo has hit a target!");
+                    mCountT--;
+                    break;
+                }
+            }
+        }else if(action=='r'){
             if(mCountR==0){
                 continue;
             }
@@ -149,13 +162,16 @@ int main(void){
 
 
         //enemy turn
+        bool enemyHit=false;
+        char c;
+
         srandom(time(NULL));
         int targetI = rand()%15;
         int targetJ = rand()%15;
-        if(myBoard[targetI][targetJ]!='*'){
-            printf("The enemy has hit your %c-type warship!", myBoard[targetI][targetJ]);
-
+        if(myBoard[targetI][targetJ]!='*' && myBoard[targetI][targetJ]!='+'){
+            c=myBoard[targetI][targetJ];
             myBoard[targetI][targetJ]='$';
+            enemyHit=true;
             }else{
             myBoard[targetI][targetJ]='+';
         }
@@ -190,5 +206,11 @@ int main(void){
         //generate my board
         printf("\nMy Board: \n");
         printBoard(myBoard);
+        sleep(2);
+        if(enemyHit){
+            printf("The enemy has hit your %c-type warship!\n", c);
+        }else{
+            printf("The enemy misses!\n");
+        }
     }
 }
