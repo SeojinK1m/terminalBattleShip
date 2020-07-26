@@ -49,7 +49,7 @@ int main(void){
     printBoard(myBoard);
 
     int eCountR=3, eCountT=1;
-    int mCountR=3, mCountT=1;
+    int mCountR=5, mCountT=2;
 
     while(true){
         int eCountS=0, eCountH=0, eCountL=0, eCountB=0, eCountA=0, eCountC=0, eCountD=0;
@@ -65,14 +65,55 @@ int main(void){
         scanf("%i", &mRow);
         printf("Which column? ");
         scanf("%i", &mCol);
-        if(enemyBoard[mRow][mCol]=='*'){
-            enemyBoard[mRow][mCol]='+';
-            enemyBoardOverlay[mRow][mCol]='+';
-        }else{
-            enemyBoard[mRow][mCol]='$';
-            enemyBoardOverlay[mRow][mCol]='$';
+        printf("What would you like to do? (r or f)");
+        scanf(" %c", &action);
+
+        if(action=='f'){
+            if(enemyBoard[mRow][mCol]=='*'){
+                enemyBoard[mRow][mCol]='+';
+                enemyBoardOverlay[mRow][mCol]='+';
+            }else{
+                enemyBoard[mRow][mCol]='$';
+                enemyBoardOverlay[mRow][mCol]='$';
+            }
         }
-        
+
+        if(action=='r'){
+            if(mCountR==0){
+                continue;
+            }
+            mCountR--;
+            bool in = false;
+            for(int i=mRow-1; i<=mRow+1; i++){
+                for(int j=mCol-1; j<=mCol+1; j++){
+                    if(enemyBoard[i][j]!='*' && enemyBoard[i][j]!='+'){
+                        in=true;
+                    }
+                }
+            }
+            if(in==true){
+                for(int i=mRow-1; i<=mRow+1; i++){
+                    for(int j=mCol-1; j<=mCol+1; j++){
+                        enemyBoardOverlay[i][j]='?';
+                    }
+                }
+                printf("there may be an enemy in this area....\n");
+            }else{
+                for(int i=mRow-1; i<=mRow+1; i++){
+                    for(int j=mCol-1; j<=mCol+1; j++){
+                        enemyBoardOverlay[i][j]='/';
+                    }
+                }
+                printf("there are no enemies in this area...\n");
+            }
+            printf("you have enough fuel to perform recoinaissance %i more times\n", mCountR);
+        }
+
+        if(action=='q'){
+            return(1);
+        }
+        sleep(5);
+          
         //count
         for(int i=0; i<16; i++){
             for(int j=0; j<16; j++){
@@ -104,11 +145,16 @@ int main(void){
         printf("\nEnemy Board: \n");
         printBoard(enemyBoardOverlay);
 
+
+
+
         //enemy turn
         srandom(time(NULL));
         int targetI = rand()%15;
         int targetJ = rand()%15;
         if(myBoard[targetI][targetJ]!='*'){
+            printf("The enemy has hit your %c-type warship!", myBoard[targetI][targetJ]);
+
             myBoard[targetI][targetJ]='$';
             }else{
             myBoard[targetI][targetJ]='+';
